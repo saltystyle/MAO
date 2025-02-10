@@ -7,4 +7,9 @@ setup(
     author='Shion Takeno',  # 作者名
     packages=find_packages(),  # 使うモジュール一覧を指定する
     #license='MIT'  # ライセンス
+    entry_points={
+        "console_scripts": [
+            "vdif-qlook = mao_epl.qlook1:main",
+        ],
+    },
 )
