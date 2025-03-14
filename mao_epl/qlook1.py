@@ -55,7 +55,7 @@ def main() -> None:
     
      
     n_offset_2024 = 2
-    
+    print(f"__doc__: {__doc__}")
     
     #feed
     feed = ["c", "t", "r", "b", "l"]
