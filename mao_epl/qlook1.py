@@ -42,7 +42,8 @@ import csv
 import datetime
 
 def main() -> None:
-    
+    print(f"__doc__: {__doc__}")
+    print(f"__version__: {__version__}")
     args = docopt(__doc__, version=__version__) #コマンドライン
     path = Path(args["-f"]).resolve()
     pattern = str(args["--pattern"])
@@ -55,7 +56,7 @@ def main() -> None:
     
      
     n_offset_2024 = 2
-    print(f"__doc__: {__doc__}")
+    
     
     #feed
     feed = ["c", "t", "r", "b", "l"]
