@@ -6,6 +6,7 @@ setup(
     description="EPL",  # 説明
     author='Shion Takeno',  # 作者名
     packages=find_packages(),  # 使うモジュール一覧を指定する
+    zip_safe=False
     #license='MIT'  # ライセンス
     entry_points={
         "console_scripts": [
