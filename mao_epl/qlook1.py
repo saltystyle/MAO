@@ -82,9 +82,9 @@ def main() -> None:
         else:
             spec_cal.append(0)    
 
-    VDIF_PATTERN: Pattern = re.compile(r"\w+_(\d+)_\d.vdif")
-    match = VDIF_PATTERN.search(path.name)
-    csv_file = f'{folder}/{match.groups()[0]}.csv'  
+    
+    csv_path = path.with_suffix(".csv")
+    csv_file = f'{folder}/{csv_path.name}'
     with open(csv_file, 'w', newline='') as f:
         writer = csv.writer(f)   
         # ヘッダーを書き込む
