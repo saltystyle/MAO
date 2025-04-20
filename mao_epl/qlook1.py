@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 __all__ = ["main"]
 
-doc="""Quick look for VDIF
+doc = """Quick look for VDIF
 
 Usage: vdif-qlook [-f <PATH>] [--pattern <pattern>] [--integ <T>] [--delay <T>] [--interval <T>] [--chbin <N>] [--cal <T>] [--sample <N>]
 
@@ -21,7 +21,7 @@ Usage: vdif-qlook [-f <PATH>] [--pattern <pattern>] [--integ <T>] [--delay <T>] 
 
 
 __author__ = "Shion Takeno"
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 # standard library
