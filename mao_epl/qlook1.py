@@ -112,10 +112,9 @@ def main() -> None:
                    
         
         
-        #print(f"{match.groups()[0]}.vdif") #YYYYmmddHHMMSS.vdif
+
         print(now_time)
-        print(spec_epl)
-        time.sleep(0.5) 
+        #print(spec_epl)
         
         with open(csv_file, 'a') as f:
             writer = csv.writer(f)
