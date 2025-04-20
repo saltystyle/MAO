@@ -3,9 +3,10 @@ __all__ = ["main"]
 
 doc = """Quick look for VDIF
 
-Usage: vdif-qlook [-f <PATH>] [--pattern <pattern>] [--integ <T>] [--delay <T>] [--interval <T>] [--chbin <N>] [--cal <T>] [--sample <N>]
+Usage: vdif-qlook [-f <PATH>] [--folder <PATH>] [--pattern <pattern>] [--integ <T>] [--delay <T>] [--interval <T>] [--chbin <N>] [--cal <T>] [--sample <N>]
 
 -f <PATH>       Input VDIF file.
+--folder <PATH>  
 --pattern <pattern>
 --integ <T>     Integration time in seconds [default: 1e-2]. #積分時間
 --delay <T>     Time delay for plot in seconds [default: 0.0].
@@ -46,6 +47,7 @@ def main() -> None:
     print(f"__version__: {__version__}")
     args = docopt(__doc__, version=__version__) #コマンドライン
     path = Path(args["-f"]).resolve()
+    folder = Path(args["--folder"]).resolve()
     pattern = str(args["--pattern"])
     integ = float(args["--integ"])
     delay = float(args["--delay"])
@@ -82,7 +84,7 @@ def main() -> None:
 
     VDIF_PATTERN: Pattern = re.compile(r"\w+_(\d+)_\d.vdif")
     match = VDIF_PATTERN.search(path.name)
-    csv_file = f'../epl_csv/{match.groups()[0]}.csv'   
+    csv_file = f'{folder}/{match.groups()[0]}.csv'  
     with open(csv_file, 'w', newline='') as f:
         writer = csv.writer(f)   
         # ヘッダーを書き込む
