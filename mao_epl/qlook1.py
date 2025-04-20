@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 __all__ = ["main"]
 
-"""Quick look for VDIF
+doc="""Quick look for VDIF
 
 Usage: vdif-qlook [-f <PATH>] [--pattern <pattern>] [--integ <T>] [--delay <T>] [--interval <T>] [--chbin <N>] [--cal <T>] [--sample <N>]
 
