@@ -91,7 +91,7 @@ def main() -> None:
         writer.writerow(["time", "c", "t", "r", "b", "l"])
         
     while True:
-        s = time_time
+        s = datetime.datetime.now() 
         spec_epl = []      
        
         #最新のspecとepl
@@ -113,7 +113,7 @@ def main() -> None:
                    
         
         
-        e = time_time
+        e = datetime.datetime.now() 
         print(e-s)
         #print(spec_epl)
         
