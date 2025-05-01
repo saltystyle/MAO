@@ -70,10 +70,10 @@ def get_nth_spectrum(
 def get_nth_spectrum_in_range(path: Path, n: int, integ: float = 1e-2, delay: float = 0.0, chbin: int = 8, n_chans: int = 1024) -> np.ndarray:
     spec = get_nth_spectrum(path, n, integ, delay, chbin)
     freq = get_freq(n_chans = len(spec))
-    filtered_spec = spec[(freq >= 19.5) & (freq <= 22.0)] #ブール配列  
+    filtered_spec = spec[(freq >= 19.5) & (freq <= 22.0)] 
     return filtered_spec
 
-# キャリブレーション用のスペクトラム、最初のデータを使う
+# キャリブレーション用のスペクトラム、動かし始めの最初のデータを使う
 def get_cal_spectrum(
     path: Path, 
     n: int, 
@@ -93,7 +93,7 @@ def spectrum_zero(integ: float = 1e-2) -> np.ndarray:
     n_chans = N_ROWS_CORR_DATA // 2 #チャンネル数
     spec = np.zeros([n_units, n_chans], dtype=complex)
     freq = get_freq(n_chans = len(spec))
-    filtered_spec = spec[(freq >= 19.5) & (freq <= 22.0)] #ブール配列 
+    filtered_spec = spec[(freq >= 19.5) & (freq <= 22.0)] 
     return filtered_spec
 
 
