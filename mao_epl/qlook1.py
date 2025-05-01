@@ -91,7 +91,7 @@ def main() -> None:
         writer.writerow(["time", "c", "t", "r", "b", "l"])
         
     while True:
-        s = datetime.datetime.now() 
+        #s = datetime.datetime.now() 
         spec_epl = []      
        
         #最新のspecとepl
@@ -113,8 +113,8 @@ def main() -> None:
                    
         
         
-        e = datetime.datetime.now() 
-        print(e-s)
+        #e = datetime.datetime.now() 
+        #print(e-s)
         #print(spec_epl)
         
         with open(csv_file, 'a') as f:
