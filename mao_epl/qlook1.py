@@ -109,7 +109,7 @@ def main() -> None:
                         s = datetime.datetime.now() 
                         spectrum = get_nth_spectrum_in_range(path, j, integ, delay, chbin)  
                         e = datetime.datetime.now() 
-                        print(e-s)
+                        print(feed[i],e-s)
                         spectrum /= spec_cal[i]                    
                         spec_epl.append(convert_spectrum_to_epl(spectrum)*1e6)
                         break
