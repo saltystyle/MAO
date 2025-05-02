@@ -91,7 +91,7 @@ def main() -> None:
         writer.writerow(["time", "c", "t", "r", "b", "l"])
         
     while True:
-        #s = datetime.datetime.now() 
+        #s = time.perf_counter() 
         spec_epl = []      
        
         #最新のspecとepl
@@ -105,18 +105,15 @@ def main() -> None:
                 spec_epl.append(0)
             else:
                 for j in range(n, -1, -1):
-                    if pattern[j % pattern_len] == feed[i]:
-                        s = time.perf_counter() 
+                    if pattern[j % pattern_len] == feed[i]:                        
                         spectrum = get_nth_spectrum_in_range(path, j, integ, delay, chbin)  
-                        e = time.perf_counter() 
-                        print(feed[i],e-s)
-                        spectrum /= spec_cal[i]                    
+                        spectrum /= spec_cal[i]  
                         spec_epl.append(convert_spectrum_to_epl(spectrum)*1e6)
                         break
                    
         
         
-        #e = datetime.datetime.now() 
+        #e = time.perf_counter() 
         #print(e-s)
         #print(spec_epl)
         
