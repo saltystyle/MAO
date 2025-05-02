@@ -43,7 +43,6 @@ def get_nth_spectrum(
     delay: float = 0.0,
     chbin: int = 8,
 ) -> np.ndarray:
-    s = time.perf_counter() 
     n_integ = int(integ / TIME_PER_SCAN) #積分スキャン数
     n_units = N_UNITS_PER_SCAN * n_integ #積分に必要なユニット数
     n_chans = N_ROWS_CORR_DATA // 2 #チャンネル数
@@ -65,13 +64,14 @@ def get_nth_spectrum(
 
     spectra = spectra.reshape([n_integ, N_UNITS_PER_SCAN * n_chans])
     spectrum = integrate_spectra(spectra, chbin) #integrate_spectraにspectra, chbinを代入
-    e = time.perf_counter() 
-    print(e-s)
     return spectrum
 
 # 周波数範囲を指定
 def get_nth_spectrum_in_range(path: Path, n: int, integ: float = 1e-2, delay: float = 0.0, chbin: int = 8, n_chans: int = 1024) -> np.ndarray:
+    s = time.perf_counter() 
     spec = get_nth_spectrum(path, n, integ, delay, chbin)
+    e = time.perf_counter() 
+    print(e-s)
     freq = get_freq(n_chans = len(spec))
     filtered_spec = spec[(freq >= 19.5) & (freq <= 22.0)] 
     return filtered_spec
