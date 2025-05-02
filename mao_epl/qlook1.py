@@ -43,8 +43,8 @@ import csv
 import datetime
 
 def main() -> None:
-    print(f"__doc__: {__doc__}")
-    print(f"__version__: {__version__}")
+    #print(f"__doc__: {__doc__}")
+    #print(f"__version__: {__version__}")
     args = docopt(__doc__, version=__version__) #コマンドライン
     path = Path(args["-f"]).resolve()
     folder = Path(args["--folder"]).resolve()
