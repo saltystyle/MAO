@@ -107,7 +107,7 @@ def main() -> None:
                 for j in range(n, -1, -1):
                     if pattern[j % pattern_len] == feed[i]:
                         s = datetime.datetime.now() 
-                        spectrum = get_nth_spectrum_in_range(path, j, integ, delay, chbin)  ]
+                        spectrum = get_nth_spectrum_in_range(path, j, integ, delay, chbin)  
                         e = datetime.datetime.now() 
                         print(e-s)
                         spectrum /= spec_cal[i]                    
