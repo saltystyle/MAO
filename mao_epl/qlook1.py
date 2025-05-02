@@ -105,8 +105,11 @@ def main() -> None:
                 spec_epl.append(0)
             else:
                 for j in range(n, -1, -1):
-                    if pattern[j % pattern_len] == feed[i]:                                        
-                        spectrum = get_nth_spectrum_in_range(path, j, integ, delay, chbin)  
+                    if pattern[j % pattern_len] == feed[i]:
+                        s = datetime.datetime.now() 
+                        spectrum = get_nth_spectrum_in_range(path, j, integ, delay, chbin)  ]
+                        e = datetime.datetime.now() 
+                        print(e-s)
                         spectrum /= spec_cal[i]                    
                         spec_epl.append(convert_spectrum_to_epl(spectrum)*1e6)
                         break
