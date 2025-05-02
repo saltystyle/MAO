@@ -43,7 +43,7 @@ def get_nth_spectrum(
     delay: float = 0.0,
     chbin: int = 8,
 ) -> np.ndarray:
-    s = datetime.datetime.now() 
+    s = datetime.now() 
     n_integ = int(integ / TIME_PER_SCAN) #積分スキャン数
     n_units = N_UNITS_PER_SCAN * n_integ #積分に必要なユニット数
     n_chans = N_ROWS_CORR_DATA // 2 #チャンネル数
@@ -65,7 +65,7 @@ def get_nth_spectrum(
 
     spectra = spectra.reshape([n_integ, N_UNITS_PER_SCAN * n_chans])
     spectrum = integrate_spectra(spectra, chbin) #integrate_spectraにspectra, chbinを代入
-    e = datetime.datetime.now() 
+    e = datetime.now() 
     print(e-s)
     return spectrum
 
