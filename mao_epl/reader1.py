@@ -70,10 +70,10 @@ def get_nth_spectrum(
 def get_nth_spectrum_in_range(path: Path, n: int, integ: float = 1e-2, delay: float = 0.0, chbin: int = 8, n_chans: int = 1024) -> np.ndarray:
     s = time.perf_counter() 
     spec = get_nth_spectrum(path, n, integ, delay, chbin)
+    e = time.perf_counter() 
+    print(e-s)    
     freq = get_freq(n_chans = len(spec))
     filtered_spec = spec[(freq >= 19.5) & (freq <= 22.0)]
-    e = time.perf_counter() 
-    print(e-s)
     return filtered_spec
 
 # キャリブレーション用のスペクトラム、動かし始めの最初のデータを使う
