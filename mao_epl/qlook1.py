@@ -34,7 +34,7 @@ from pathlib import Path
 import numpy as np
 import os
 from docopt import docopt
-from .reader1 import  get_cal_spectrum, generate_patterned, get_nth_spectrum_in_range, convert_spectrum_to_epl, get_n_from_current_time
+from .reader1 import  get_cal_spectrum, generate_patterned, get_nth_spectrum_in_range, convert_spectrum_to_epl, get_n_from_current_time, get_freq
 
 import re
 from typing import Pattern
@@ -42,8 +42,6 @@ import csv
 import datetime
 
 def main() -> None:
-    #print(f"__doc__: {__doc__}")
-    #print(f"__version__: {__version__}")
     args = docopt(__doc__, version=__version__) #コマンドライン
     path = Path(args["-f"]).resolve()
     folder = Path(args["--folder"]).resolve()
@@ -66,7 +64,9 @@ def main() -> None:
     m = []
     for i in range(5):
         m.append(pattern.find(feed[i]))
-
+        
+    freq = get_freq()
+    freq_selected = freq[(freq >= 19.5) & (freq <= 22.0)]
     spec_zero = 0   
     
     #キャリブレーション
@@ -76,7 +76,7 @@ def main() -> None:
     for i in range(5):
         if m[i] != -1:
             l = (n - n%pattern_len -pattern_len) + m[i] 
-            spectrum_cal = get_cal_spectrum(path, l, cal, delay, chbin)
+            spectrum_cal = get_cal_spectrum(path, l, freq, cal, delay, chbin)
             spec_cal.append(spectrum_cal)  
         else:
             spec_cal.append(0)    
@@ -90,7 +90,7 @@ def main() -> None:
         writer.writerow(["time", "c", "t", "r", "b", "l"])
         
     while True:
-        #s = time.perf_counter() 
+        s = time.perf_counter() 
         spec_epl = []      
        
         #最新のspecとepl
@@ -105,15 +105,15 @@ def main() -> None:
             else:
                 for j in range(n, -1, -1):
                     if pattern[j % pattern_len] == feed[i]:                        
-                        spectrum = get_nth_spectrum_in_range(path, j, integ, delay, chbin)  
+                        spectrum = get_nth_spectrum_in_range(path, j, freq, integ, delay, chbin)  
                         spectrum /= spec_cal[i]  
-                        spec_epl.append(convert_spectrum_to_epl(spectrum)*1e6)
+                        spec_epl.append(convert_spectrum_to_epl(spectrum, freq_selected)*1e6)
                         break
                    
         
         
-        #e = time.perf_counter() 
-        #print(e-s)
+        e = time.perf_counter() 
+        print(e-s)
         #print(spec_epl)
         
         with open(csv_file, 'a') as f:
