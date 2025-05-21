@@ -90,7 +90,7 @@ def main() -> None:
         writer.writerow(["time", "c", "t", "r", "b", "l"])
         
     while True:
-        s = time.perf_counter() 
+        #s = time.perf_counter() 
         spec_epl = []      
        
         #最新のspecとepl
@@ -110,15 +110,12 @@ def main() -> None:
                         spec_epl.append(convert_spectrum_to_epl(spectrum, freq_selected)*1e6)
                         break
                    
-        
-        
-        e = time.perf_counter() 
-        print(e-s)
-        #print(spec_epl)
-        
         with open(csv_file, 'a') as f:
             writer = csv.writer(f)
             writer.writerow([now_time] + spec_epl)
+            
+        #e = time.perf_counter() 
+        #print("while:",e-s)    
     
 
 # run command line interface
