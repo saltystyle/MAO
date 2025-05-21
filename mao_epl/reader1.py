@@ -13,7 +13,7 @@ import re
 
 # dependent packages
 import numpy as np 
-from docopt import docopt
+#from docopt import docopt
 
 # constants
 LITTLE_ENDIAN: str = "<" # 変数”LITTLE_ENDIAN”が文字列型、＜を代入して制御
@@ -29,7 +29,7 @@ TIME_PER_SCAN: float = 1e-2  # seconds #1スキャンあたりの時間　10ms
 TIME_FORMAT: str = "%Y%j%H%M%S"
 VDIF_PATTERN: Pattern = re.compile(r"\w+_(\d+)_\d.vdif")
 LOWER_FREQ_MHZ = 16384 #周波数の下限値(MHｚ)
-N_CHANS_FOR_FORMAT = 8192
+#N_CHANS_FOR_FORMAT = 8192
 C = 299792458 # m/s
 PI = np.pi
 
@@ -43,16 +43,17 @@ def get_nth_spectrum(
     delay: float = 0.0,
     chbin: int = 8,
 ) -> np.ndarray:
-    n_integ = int(integ / TIME_PER_SCAN) #積分スキャン数
-    n_units = N_UNITS_PER_SCAN * n_integ #積分に必要なユニット数
-    n_chans = N_ROWS_CORR_DATA // 2 #チャンネル数
+    #s = time.perf_counter() 
+    n_integ = int(integ / TIME_PER_SCAN) 
+    n_units = N_UNITS_PER_SCAN * n_integ 
+    n_chans = N_ROWS_CORR_DATA // 2 
 
-    byte_start = N_BYTES_PER_SCAN * n #読み込みたいデータ
+    byte_start = N_BYTES_PER_SCAN * n 
 
     if byte_start < 0:
         raise ValueError("Not enough data in the file to integrate")
     
-    spectra = np.empty([n_units, n_chans], dtype=complex)#空のスペクトラ配列を作成    
+    spectra = np.empty([n_units, n_chans], dtype=complex)   
 
     with open(path, "rb") as f:
         f.seek(byte_start, 0)
@@ -63,29 +64,28 @@ def get_nth_spectrum(
             spectra[i] = parse_corr_data(corr_data)
 
     spectra = spectra.reshape([n_integ, N_UNITS_PER_SCAN * n_chans])
-    spectrum = integrate_spectra(spectra, chbin) #integrate_spectraにspectra, chbinを代入
+    spectrum = integrate_spectra(spectra, chbin) 
+    #e = time.perf_counter() 
+    #print(e - s)
     return spectrum
 
 # 周波数範囲を指定
-def get_nth_spectrum_in_range(path: Path, n: int, integ: float = 1e-2, delay: float = 0.0, chbin: int = 8, n_chans: int = 1024) -> np.ndarray:
-    s = time.perf_counter() 
+def get_nth_spectrum_in_range(path: Path, n: int, freq: np.ndarray, integ: float = 1e-2, delay: float = 0.0, chbin: int = 8) -> np.ndarray:
     spec = get_nth_spectrum(path, n, integ, delay, chbin)
-    e = time.perf_counter() 
-    print(e-s)    
-    freq = get_freq(n_chans = len(spec))
-    filtered_spec = spec[(freq >= 19.5) & (freq <= 22.0)]
+    filtered_spec = spec[(freq >= 19.5) & (freq <= 22.0)] 
     return filtered_spec
 
-# キャリブレーション用のスペクトラム、動かし始めの最初のデータを使う
+# キャリブレーション用のスペクトラム、最初のデータを使う
 def get_cal_spectrum(
     path: Path, 
-    n: int, 
+    n: int,
+    freq: np.ndarray, 
     cal: float = 1e-2, 
     delay: float = 0.0,
     chbin: int = 8) -> np.ndarray:
     while get_elapsed_time_from_start(path, delay) < (n+1)*TIME_PER_SCAN: #経過時間がキャリブレーション時間を経過するまで0.01秒ごとに待機
         time.sleep(0.01)
-    return get_nth_spectrum_in_range(path, n, cal, delay, chbin)     
+    return get_nth_spectrum_in_range(path, n, freq,  cal, delay, chbin)     
 
  
 
@@ -102,15 +102,15 @@ def spectrum_zero(integ: float = 1e-2) -> np.ndarray:
 
 
 #EPL
-def convert_spectrum_to_epl(spec: np.ndarray) -> float:
-    fit = curve_fit(line_through_origin, get_freq(n_chans = len(spec)), get_phase(spec)) 
+def convert_spectrum_to_epl(spec: np.ndarray, freq: np.ndarray) -> float:
+    fit = curve_fit(line_through_origin, freq, get_phase(spec)) 
     slope = fit[0] 
     slope = slope[0]
     epl = (C * slope * 1e-9) / (2 * PI)
     return epl
 
 #周波数
-def get_freq(bin_width: int = 8, n_chans: int = 1024) -> np.ndarray:
+def get_freq(bin_width: int = 8, n_chans: int = 2048) -> np.ndarray:
     freq = 1e-3 * (LOWER_FREQ_MHZ + np.arange(n_chans * bin_width))
     freq = freq.reshape((n_chans, bin_width)).mean(-1)
     return freq
@@ -184,7 +184,6 @@ def get_elapsed_time_from_start(path: Path , delay: float = 0.0) -> float:
 
 
 # struct readers
-# データの読み取り
 def make_binary_reader(n_rows: int, dtype: str) -> Callable: #読み取るデータの行数、データの型を指定(I：符号なし整数、H：短整数)
     struct = Struct(LITTLE_ENDIAN + dtype * n_rows) #??
 
