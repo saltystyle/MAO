@@ -43,7 +43,7 @@ def get_nth_spectrum(
     delay: float = 0.0,
     chbin: int = 8,
 ) -> np.ndarray:
-    #s = time.perf_counter() 
+    s = time.perf_counter() 
     n_integ = int(integ / TIME_PER_SCAN) 
     n_units = N_UNITS_PER_SCAN * n_integ 
     n_chans = N_ROWS_CORR_DATA // 2 
@@ -65,8 +65,8 @@ def get_nth_spectrum(
 
     spectra = spectra.reshape([n_integ, N_UNITS_PER_SCAN * n_chans])
     spectrum = integrate_spectra(spectra, chbin) 
-    #e = time.perf_counter() 
-    #print(e - s)
+    e = time.perf_counter() 
+    print("get_nth_spectrum:",e - s)
     return spectrum
 
 # 周波数範囲を指定
@@ -129,9 +129,6 @@ def generate_patterned(pattern: str, times: int = 5, offset: int = 0):
 def get_n_from_current_time(path: Path, delay: float = 0) -> int:
     n = int(get_elapsed_time_from_start(path, delay) / TIME_PER_SCAN) -1 
     return n
-
-
-    
     
 
 
@@ -151,12 +148,6 @@ def get_phase(da: np.ndarray) -> np.ndarray:
 def line_through_origin(freq: np.ndarray, slope: float) -> np.ndarray :
     """原点を通る直線モデル"""
     return slope * freq 
-
-
-
-
-
-
 
 
 
@@ -185,7 +176,7 @@ def get_elapsed_time_from_start(path: Path , delay: float = 0.0) -> float:
 
 # struct readers
 def make_binary_reader(n_rows: int, dtype: str) -> Callable: #読み取るデータの行数、データの型を指定(I：符号なし整数、H：短整数)
-    struct = Struct(LITTLE_ENDIAN + dtype * n_rows) #??
+    struct = Struct(LITTLE_ENDIAN + dtype * n_rows)
 
     def reader(f):
         return struct.unpack(f.read(struct.size)) #Pythonのデータ型に変換
@@ -208,7 +199,7 @@ def parse_corr_head(corr_head: list):
     pass
 
 #相関データを解析する
-def parse_corr_data(corr_data: list) -> np.ndarray: #corr_data: list:複素数データを表すリスト
-    real = np.array(corr_data[0::2]) #偶数の要素を実部
-    imag = np.array(corr_data[1::2]) #奇数の要素を虚部
+def parse_corr_data(corr_data: list) -> np.ndarray:
+    real = np.array(corr_data[0::2])
+    imag = np.array(corr_data[1::2])
     return real + imag * 1j
