@@ -43,7 +43,7 @@ def get_nth_spectrum(
     delay: float = 0.0,
     chbin: int = 8,
 ) -> np.ndarray:
-    s = time.perf_counter() 
+    #s = time.perf_counter() 
     n_integ = int(integ / TIME_PER_SCAN) 
     n_units = N_UNITS_PER_SCAN * n_integ 
     n_chans = N_ROWS_CORR_DATA // 2 
@@ -65,8 +65,8 @@ def get_nth_spectrum(
 
     spectra = spectra.reshape([n_integ, N_UNITS_PER_SCAN * n_chans])
     spectrum = integrate_spectra(spectra, chbin) 
-    e = time.perf_counter() 
-    print("get_nth_spectrum:",e - s)
+    #e = time.perf_counter() 
+    #print("get_nth_spectrum:",e - s)
     return spectrum
 
 # 周波数範囲を指定
