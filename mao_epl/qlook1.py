@@ -42,6 +42,7 @@ import csv
 import datetime
 
 def main() -> None:
+    s = time.perf_counter() 
     args = docopt(__doc__, version=__version__) #コマンドライン
     path = Path(args["-f"]).resolve()
     folder = Path(args["--folder"]).resolve()
@@ -68,11 +69,13 @@ def main() -> None:
     freq = get_freq()
     freq_selected = freq[(freq >= 19.5) & (freq <= 22.0)]
     spec_zero = 0   
+    e = time.perf_counter() 
+    print("キャリブレーション前:", e-s)
     
     #キャリブレーション
     spec_cal = []
     #n = get_n_from_current_time(path, delay)
-    n=40    
+    n=500    
     for i in range(5):
         if m[i] != -1:
             l = (n - n%pattern_len -pattern_len) + m[i] 
@@ -95,7 +98,7 @@ def main() -> None:
        
         #最新のspecとepl
         #n = get_n_from_current_time(path, delay)
-        n=n+1
+        n=n+50
         now = datetime.datetime.now()  
         now_time = now.strftime('%Y%m%d %H:%M:%S.%f')[:-3]
         for i in range(5):
