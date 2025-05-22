@@ -72,7 +72,7 @@ def main() -> None:
     spec_cal = [np.zeros(312, dtype=np.complex128) for _ in range(5)]  # Nはチャンネル数など
     
     t = time.perf_counter() #calスタート時間
-    n = 50
+    n = 500
     c = 0
     a = -1
     while cal > time.perf_counter() - t + 0.01: #0.01秒前に次に進む、ここは処理時間次第
@@ -113,7 +113,7 @@ def main() -> None:
         spec_epl = []      
        
         #n = get_n_from_current_time(path, delay)        
-        n=n+1    
+        n=n+10    
         now = datetime.datetime.now()  
         now_time = now.strftime('%Y%m%d %H:%M:%S.%f')[:-3] #jst
         for i in range(5):
