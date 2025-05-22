@@ -65,7 +65,7 @@ def main() -> None:
     for i in range(5):
         m.append(pattern.find(feed[i]))
 
-     csv_path = path.with_suffix(".csv")
+    csv_path = path.with_suffix(".csv")
     csv_file = f'{folder}/{csv_path.name}'
     
     with open(csv_file, 'w', newline='') as f:
