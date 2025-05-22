@@ -42,6 +42,7 @@ import csv
 import datetime
 
 def main() -> None:
+    s = time.perf_counter()
     args = docopt(__doc__, version=__version__) #コマンドライン
     path = Path(args["-f"]).resolve()
     folder = Path(args["--folder"]).resolve()
@@ -64,6 +65,14 @@ def main() -> None:
     for i in range(5):
         m.append(pattern.find(feed[i]))
 
+     csv_path = path.with_suffix(".csv")
+    csv_file = f'{folder}/{csv_path.name}'
+    
+    with open(csv_file, 'w', newline='') as f:
+        writer = csv.writer(f)  
+        # ヘッダーを書き込む
+        writer.writerow(["time", "c", "t", "r", "b", "l"])
+        
     freq = get_freq()
     freq_selected = freq[(freq >= 19.5) & (freq <= 22.0)]
     
@@ -75,8 +84,12 @@ def main() -> None:
     n = 500
     c = 0
     a = -1
+
+    e = time.perf_counter()
+    print("cal前処理:",e-s)
+
     while cal > time.perf_counter() - t + 0.01: #0.01秒前に次に進む、ここは処理時間次第
-        s = time.perf_counter()
+        #s = time.perf_counter()
         #n = get_n_from_current_time(path, delay)#（データの時刻-開始時刻）÷0.01の関数に書きかえ
         n = n+1
         target = pattern[n % pattern_len]
@@ -88,21 +101,13 @@ def main() -> None:
         a = n   
         spec_cal[f] += get_nth_spectrum_in_range(path, n, freq, integ, delay, chbin)
         c += 1
-        e = time.perf_counter()
-        print("cal_while:",e-s)
+        #e = time.perf_counter()
+        #print("cal_while:",e-s)
     
     s = time.perf_counter() 
     spec_cal = [arr / c for arr in spec_cal]
     e = time.perf_counter()
     print("除算:",e-s)
-    
-    csv_path = path.with_suffix(".csv")
-    csv_file = f'{folder}/{csv_path.name}'
-    
-    with open(csv_file, 'w', newline='') as f:
-        writer = csv.writer(f)  
-        # ヘッダーを書き込む
-        writer.writerow(["time", "c", "t", "r", "b", "l"])
     
     
     t = time.perf_counter() #calスタート時間
