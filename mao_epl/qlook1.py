@@ -42,7 +42,6 @@ import csv
 import datetime
 
 def main() -> None:
-    s = time.perf_counter() 
     args = docopt(__doc__, version=__version__) #コマンドライン
     path = Path(args["-f"]).resolve()
     folder = Path(args["--folder"]).resolve()
@@ -57,7 +56,6 @@ def main() -> None:
      
     n_offset_2024 = 2
     
-    
     #feed
     feed = ["c", "t", "r", "b", "l"]
     pattern = generate_patterned(pattern, sample, n_offset_2024)
@@ -65,63 +63,81 @@ def main() -> None:
     m = []
     for i in range(5):
         m.append(pattern.find(feed[i]))
-        
+
     freq = get_freq()
     freq_selected = freq[(freq >= 19.5) & (freq <= 22.0)]
-    spec_zero = 0   
-    e = time.perf_counter() 
-    print("キャリブレーション前:", e-s)
+    
     
     #キャリブレーション
-    spec_cal = []
-    #n = get_n_from_current_time(path, delay)
-    n=500    
-    for i in range(5):
-        if m[i] != -1:
-            l = (n - n%pattern_len -pattern_len) + m[i] 
-            spectrum_cal = get_cal_spectrum(path, l, freq, cal, delay, chbin)
-            spec_cal.append(spectrum_cal)  
+    spec_cal = [np.zeros(312, dtype=np.complex128) for _ in range(5)]  # Nはチャンネル数など
+    
+    t = time.perf_counter() #calスタート時間
+    n = 50
+    c = 0
+    a = -1
+    while cal > time.perf_counter() - t + 0.01: #0.01秒前に次に進む、ここは処理時間次第
+        s = time.perf_counter()
+        #n = get_n_from_current_time(path, delay)#（データの時刻-開始時刻）÷0.01の関数に書きかえ
+        n = n+1
+        target = pattern[n % pattern_len]
+        if n != a and target in feed:   
+            f = feed.index(target)
         else:
-            spec_cal.append(0)    
-
+            time.sleep(0.005)
+            continue        
+        a = n   
+        spec_cal[f] += get_nth_spectrum_in_range(path, n, freq, integ, delay, chbin)
+        c += 1
+        e = time.perf_counter()
+        print("cal_while:",e-s)
+    
+    s = time.perf_counter() 
+    spec_cal = [arr / c for arr in spec_cal]
+    e = time.perf_counter()
+    print("除算:",e-s)
     
     csv_path = path.with_suffix(".csv")
     csv_file = f'{folder}/{csv_path.name}'
+    
     with open(csv_file, 'w', newline='') as f:
-        writer = csv.writer(f)   
+        writer = csv.writer(f)  
         # ヘッダーを書き込む
         writer.writerow(["time", "c", "t", "r", "b", "l"])
-        
+    
+    
+    t = time.perf_counter() #calスタート時間
+    c = 0
+    
     while True:
-        #s = time.perf_counter() 
+        #s = time.perf_counter()
         spec_epl = []      
        
-        #最新のspecとepl
-        #n = get_n_from_current_time(path, delay)
-        n=n+50
+        #n = get_n_from_current_time(path, delay)        
+        n=n+1    
         now = datetime.datetime.now()  
-        now_time = now.strftime('%Y%m%d %H:%M:%S.%f')[:-3]
+        now_time = now.strftime('%Y%m%d %H:%M:%S.%f')[:-3] #jst
         for i in range(5):
             if m[i] == -1: #pattern内に文字が一致しなければ空で返す
-                spectrum = spec_zero
                 spec_epl.append(0)
             else:
                 for j in range(n, -1, -1):
-                    if pattern[j % pattern_len] == feed[i]:                        
+                    if pattern[j % pattern_len] == feed[i]:                                        
                         spectrum = get_nth_spectrum_in_range(path, j, freq, integ, delay, chbin)  
-                        spectrum /= spec_cal[i]  
-                        spec_epl.append(convert_spectrum_to_epl(spectrum, freq_selected)*1e6)
+                        #ここでspec_cal_beforに加算
+                        #if 時間経ったら
+                           #spec_cal = [arr / c for arr in spec_cal_befor]
+                        spectrum /= spec_cal[i]                    
+                        spec_epl.append(float(convert_spectrum_to_epl(spectrum, freq_selected)*1e6))
                         break
-                   
+
+        
         with open(csv_file, 'a') as f:
             writer = csv.writer(f)
             writer.writerow([now_time] + spec_epl)
-            
-        #e = time.perf_counter() 
-        #print("while:",e-s)    
+        #e = time.perf_counter()
+        #print(e-s)    
     
 
 # run command line interface
 if __name__ == "__main__":
     main()
-    
