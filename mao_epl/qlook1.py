@@ -83,7 +83,7 @@ def main() -> None:
     spec_cal = [np.zeros(312, dtype=np.complex128) for _ in range(5)]  
     
     t = time.perf_counter() #calスタート時間
-    n = 50
+    n = 100
     count = [np.zeros(1,dtype=int) for _ in range(5)] 
     a = -1
     while cal >= time.perf_counter() - t :
@@ -116,7 +116,7 @@ def main() -> None:
     spec_cal_befor = [np.zeros(312, dtype=np.complex128) for _ in range(5)]
     
     while True:
-        #s = time.perf_counter()
+        s = time.perf_counter()
         spec_epl = []      
        
         #n = get_n_from_current_time(path, delay)        
@@ -145,8 +145,8 @@ def main() -> None:
         with open(csv_file, 'a') as f:
             writer = csv.writer(f)
             writer.writerow([now_time] + spec_epl)
-        #e = time.perf_counter()
-        #print(e-s)    
+        e = time.perf_counter()
+        print(e-s)    
     
 
 # run command line interface
