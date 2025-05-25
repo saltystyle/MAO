@@ -21,8 +21,9 @@ Usage: vdif-qlook [-f <PATH>] [--folder <PATH>] [--pattern <pattern>] [--integ <
 
 
 
+
 __author__ = "Shion Takeno"
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 
 # standard library
@@ -32,17 +33,18 @@ from pathlib import Path
 
 # dependencies
 import numpy as np
+import matplotlib.pyplot as plt
 import os
 from docopt import docopt
-from .reader1 import  get_cal_spectrum, generate_patterned, get_nth_spectrum_in_range, convert_spectrum_to_epl, get_n_from_current_time, get_freq
+from vdif_reader5_6 import  get_cal_spectrum, spectrum_zero,generate_patterned, get_nth_spectrum_in_range, get_phase, get_amp,  convert_spectrum_to_epl, get_n_from_current_time, get_freq
 
 import re
-from typing import Pattern
+from typing import Callable, Pattern
 import csv 
 import datetime
+import sys
 
 def main() -> None:
-    s = time.perf_counter()
     args = docopt(__doc__, version=__version__) #コマンドライン
     path = Path(args["-f"]).resolve()
     folder = Path(args["--folder"]).resolve()
@@ -65,31 +67,26 @@ def main() -> None:
     for i in range(5):
         m.append(pattern.find(feed[i]))
 
+    freq = get_freq()
+    freq_selected = freq[(freq >= 19.5) & (freq <= 22.0)]
+    
     csv_path = path.with_suffix(".csv")
     csv_file = f'{folder}/{csv_path.name}'
-    
     with open(csv_file, 'w', newline='') as f:
         writer = csv.writer(f)  
         # ヘッダーを書き込む
         writer.writerow(["time", "c", "t", "r", "b", "l"])
-        
-    freq = get_freq()
-    freq_selected = freq[(freq >= 19.5) & (freq <= 22.0)]
     
     
+    #get_cal_spectrumに入れる    
     #キャリブレーション
-    spec_cal = [np.zeros(312, dtype=np.complex128) for _ in range(5)]  # Nはチャンネル数など
+    spec_cal = [np.zeros(312, dtype=np.complex128) for _ in range(5)]  
     
     t = time.perf_counter() #calスタート時間
-    n = 500
-    c = 0
+    n = 50
+    count = [np.zeros(1,dtype=int) for _ in range(5)] 
     a = -1
-
-    e = time.perf_counter()
-    print("cal前処理:",e-s)
-
-    while cal > time.perf_counter() - t + 0.01: #0.01秒前に次に進む、ここは処理時間次第
-        #s = time.perf_counter()
+    while cal >= time.perf_counter() - t :
         #n = get_n_from_current_time(path, delay)#（データの時刻-開始時刻）÷0.01の関数に書きかえ
         n = n+1
         target = pattern[n % pattern_len]
@@ -99,26 +96,31 @@ def main() -> None:
             time.sleep(0.005)
             continue        
         a = n   
+        
+        #s = time.perf_counter()  
         spec_cal[f] += get_nth_spectrum_in_range(path, n, freq, integ, delay, chbin)
-        c += 1
         #e = time.perf_counter()
-        #print("cal_while:",e-s)
+        #print("加算:",e-s)
+        count[f] += 1
+        print("count:", count)
     
-    s = time.perf_counter() 
-    spec_cal = [arr / c for arr in spec_cal]
-    e = time.perf_counter()
-    print("除算:",e-s)
+    #s = time.perf_counter() 
+    spec_cal = [spec_cal[i] / count[i] for i in range(5)]
+    #e = time.perf_counter()
+    #print("除算:",e-s)
     
+
     
-    t = time.perf_counter() #calスタート時間
-    c = 0
+    t = time.perf_counter()#最終キャリブレーション更新時刻
+    count = [np.zeros(1,dtype=int) for _ in range(5)]
+    spec_cal_befor = [np.zeros(312, dtype=np.complex128) for _ in range(5)]
     
     while True:
         #s = time.perf_counter()
         spec_epl = []      
        
         #n = get_n_from_current_time(path, delay)        
-        n=n+10    
+        n=n+1    
         now = datetime.datetime.now()  
         now_time = now.strftime('%Y%m%d %H:%M:%S.%f')[:-3] #jst
         for i in range(5):
@@ -128,14 +130,18 @@ def main() -> None:
                 for j in range(n, -1, -1):
                     if pattern[j % pattern_len] == feed[i]:                                        
                         spectrum = get_nth_spectrum_in_range(path, j, freq, integ, delay, chbin)  
-                        #ここでspec_cal_beforに加算
-                        #if 時間経ったら
-                           #spec_cal = [arr / c for arr in spec_cal_befor]
+                        spec_cal_befor[i] += spectrum
+                        count[i] += 1
+                        print("count:", count)
+                        if time.perf_counter()-t >= cal: #cal秒経過したら
+                           spec_cal = [spec_cal[i] / count[i] for i in range(5)]
+                           t = time.perf_counter()
+                           count = [np.zeros(1,dtype=int) for _ in range(5)]
                         spectrum /= spec_cal[i]                    
-                        spec_epl.append(float(convert_spectrum_to_epl(spectrum, freq_selected)*1e6))
+                        spec_epl.append(float(convert_spectrum_to_epl(spectrum, freq_selected)*1e6)) #um
                         break
 
-        
+
         with open(csv_file, 'a') as f:
             writer = csv.writer(f)
             writer.writerow([now_time] + spec_epl)
