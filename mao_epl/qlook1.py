@@ -102,7 +102,7 @@ def main() -> None:
         #e = time.perf_counter()
         #print("加算:",e-s)
         count[f] += 1
-        print("count:", count)
+        
     
     #s = time.perf_counter() 
     spec_cal = [spec_cal[i] / count[i] for i in range(5)]
@@ -116,7 +116,7 @@ def main() -> None:
     spec_cal_befor = [np.zeros(312, dtype=np.complex128) for _ in range(5)]
     
     while True:
-        s = time.perf_counter()
+        
         spec_epl = []      
        
         #n = get_n_from_current_time(path, delay)        
@@ -130,9 +130,11 @@ def main() -> None:
                 for j in range(n, -1, -1):
                     if pattern[j % pattern_len] == feed[i]:                                        
                         spectrum = get_nth_spectrum_in_range(path, j, freq, integ, delay, chbin)  
+                        s = time.perf_counter()
                         spec_cal_befor[i] += spectrum
+                        e = time.perf_counter()
+       　　　　　　　　　　print("加算",e-s)   
                         count[i] += 1
-                        print("count:", count)
                         if time.perf_counter()-t >= cal: #cal秒経過したら
                            spec_cal = [spec_cal[i] / count[i] for i in range(5)]
                            t = time.perf_counter()
@@ -145,8 +147,7 @@ def main() -> None:
         with open(csv_file, 'a') as f:
             writer = csv.writer(f)
             writer.writerow([now_time] + spec_epl)
-        e = time.perf_counter()
-        print(e-s)    
+         
     
 
 # run command line interface
