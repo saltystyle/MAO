@@ -36,7 +36,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from docopt import docopt
-from reader1 import  get_cal_spectrum, spectrum_zero,generate_patterned, get_nth_spectrum_in_range, get_phase, get_amp,  convert_spectrum_to_epl, get_n_from_current_time, get_freq
+from .reader1 import  get_cal_spectrum, spectrum_zero,generate_patterned, get_nth_spectrum_in_range, get_phase, get_amp,  convert_spectrum_to_epl, get_n_from_current_time, get_freq
 
 import re
 from typing import Callable, Pattern
