@@ -124,16 +124,17 @@ def main() -> None:
         now = datetime.datetime.now()  
         now_time = now.strftime('%Y%m%d %H:%M:%S.%f')[:-3] #jst
         for i in range(5):
+            s = time.perf_counter()
             if m[i] == -1: #pattern内に文字が一致しなければ空で返す
                 spec_epl.append(0)
             else:
                 for j in range(n, -1, -1):
                     if pattern[j % pattern_len] == feed[i]:                                        
                         spectrum = get_nth_spectrum_in_range(path, j, freq, integ, delay, chbin)  
-                        s = time.perf_counter()
+                        
                         spec_cal_befor[i] += spectrum
-                        e = time.perf_counter()
-                        print("加算",e-s)   
+                        
+                         
                         count[i] += 1
                         if time.perf_counter()-t >= cal: #cal秒経過したら
                            spec_cal = [spec_cal[i] / count[i] for i in range(5)]
@@ -142,7 +143,8 @@ def main() -> None:
                         spectrum /= spec_cal[i]                    
                         spec_epl.append(float(convert_spectrum_to_epl(spectrum, freq_selected)*1e6)) #um
                         break
-
+        e = time.perf_counter()
+        print("加算",e-s)  
 
         with open(csv_file, 'a') as f:
             writer = csv.writer(f)
