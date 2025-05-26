@@ -144,7 +144,7 @@ def main() -> None:
                         spec_epl.append(float(convert_spectrum_to_epl(spectrum, freq_selected)*1e6)) #um
                         break
         e = time.perf_counter()
-        print("加算",e-s)  
+        print("for内",e-s)  
 
         with open(csv_file, 'a') as f:
             writer = csv.writer(f)
