@@ -133,7 +133,7 @@ def main() -> None:
                         s = time.perf_counter()
                         spec_cal_befor[i] += spectrum
                         e = time.perf_counter()
-       　　　　　　　　　　print("加算:",e-s)   
+       　　　　　　　　　　print(e-s)   
                         count[i] += 1
                         if time.perf_counter()-t >= cal: #cal秒経過したら
                            spec_cal = [spec_cal[i] / count[i] for i in range(5)]
