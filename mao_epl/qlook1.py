@@ -67,7 +67,7 @@ def main() -> None:
     for i in range(5):
         m.append(pattern.find(feed[i]))
 
-    freq = get_freq()
+    freq = get_freq(chbin,)
     freq_selected = freq[(freq >= 19.5) & (freq <= 22.0)]
     
     csv_path = path.with_suffix(".csv")
